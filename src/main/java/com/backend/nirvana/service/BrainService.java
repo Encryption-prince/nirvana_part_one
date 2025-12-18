@@ -191,17 +191,17 @@ public class BrainService {
     }
     
     /**
-     * Scheduled task that runs every 30 seconds to clean up stale sessions 
-     * that have been idle for more than 1 minute.
+     * Scheduled task that runs every 60 seconds to clean up stale sessions 
+     * that have been idle for more than 5 minutes.
      */
-    @Scheduled(fixedRate = 30000) // Run every 30 seconds
+    @Scheduled(fixedRate = 60000) // Run every 60 seconds
     public void scheduleStaleSessionCleanup() {
-        long oneMinuteInMillis = 60000L;
-        List<String> removedSessions = sessionManager.removeIdleSessions(oneMinuteInMillis);
+        long fiveMinutesInMillis = 300000L; // 5 minutes instead of 1 minute
+        List<String> removedSessions = sessionManager.removeIdleSessions(fiveMinutesInMillis);
         
         // Log cleanup activity if sessions were removed
         if (!removedSessions.isEmpty()) {
-            logger.info("Cleaned up {} stale sessions: {}", removedSessions.size(), removedSessions);
+            logger.info("Cleaned up {} stale sessions (idle > 5 minutes): {}", removedSessions.size(), removedSessions);
         }
     }
 }

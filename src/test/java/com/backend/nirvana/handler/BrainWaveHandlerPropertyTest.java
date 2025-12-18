@@ -76,18 +76,28 @@ class BrainWaveHandlerPropertyTest {
             // For truly malformed JSON (unparseable), an error response should be sent
             // For valid JSON with invalid data, the system may handle it differently
             if (sentMessage.get() != null) {
-                // If a response was sent, it should be a valid error response
                 String responsePayload = sentMessage.get().getPayload();
                 MusicResponse response = objectMapper.readValue(responsePayload, MusicResponse.class);
                 
-                assertThat(response.getStatus())
-                        .as("Response should have error status")
-                        .isEqualTo("error");
+                // Check if the input was truly malformed JSON (unparseable)
+                boolean isUnparseableJson = !isValidJson(malformedJson);
                 
-                assertThat(response.getMessage())
-                        .as("Response should contain error message")
-                        .isNotNull()
-                        .contains("Invalid message format");
+                if (isUnparseableJson) {
+                    // For unparseable JSON, we should get an error response
+                    assertThat(response.getStatus())
+                            .as("Response should have error status for unparseable JSON")
+                            .isEqualTo("error");
+                    
+                    assertThat(response.getMessage())
+                            .as("Response should contain error message for unparseable JSON")
+                            .isNotNull()
+                            .contains("Invalid message format");
+                } else {
+                    // For valid JSON that might have validation issues, we might get buffering or error
+                    assertThat(response.getStatus())
+                            .as("Response should have valid status (error or buffering)")
+                            .isIn("error", "buffering");
+                }
             }
             
         } catch (Exception e) {

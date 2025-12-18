@@ -201,8 +201,8 @@ class BrainServicePropertyTest {
         // Run the scheduled cleanup
         brainService.scheduleStaleSessionCleanup();
         
-        // Property: Sessions idle for more than 1 minute (60000ms) should be cleaned up
-        boolean shouldBeCleanedUp = idleTimeMillis > 60000;
+        // Property: Sessions idle for more than 5 minutes (300000ms) should be cleaned up
+        boolean shouldBeCleanedUp = idleTimeMillis > 300000;
         
         if (shouldBeCleanedUp) {
             // Property: Idle session should be removed

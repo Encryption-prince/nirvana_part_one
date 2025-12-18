@@ -1,9 +1,23 @@
 spring:
   application:
     name: nirvana
+  websocket:
+    servlet:
+      # Configure WebSocket session timeout (10 minutes)
+      session-timeout: 600000
+      # Configure message size limits
+      max-text-message-buffer-size: 8192
+      max-binary-message-buffer-size: 8192
+
+server:
+  # Configure Tomcat WebSocket settings
+  tomcat:
+    connection-timeout: 300000  # 5 minutes
+    keep-alive-timeout: 300000  # 5 minutes
 
 logging:
   level:
     com.backend.nirvana.config.GlobalExceptionHandler: WARN  # Reduce noise from exception handler
     org.springframework.web.servlet.resource: WARN  # Reduce static resource errors
     org.springframework.web.servlet.mvc.method.annotation: WARN  # Reduce mapping errors
+    com.backend.nirvana.handler.BrainWaveHandler: INFO  # Show WebSocket activity

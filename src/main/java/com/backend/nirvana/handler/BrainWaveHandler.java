@@ -89,9 +89,13 @@ public class BrainWaveHandler extends TextWebSocketHandler {
             // Process EEG data through BrainService with error isolation
             MusicResponse response = brainService.processEEGData(sessionId, eegData);
             
-            // Send response if music was generated (response will be null if not ready yet)
+            // Send response if music was generated, or send acknowledgment for buffered data
             if (response != null) {
                 sendMusicResponse(session, response);
+            } else {
+                // Send acknowledgment that data was received and buffered
+                MusicResponse ackResponse = new MusicResponse(null, "buffering", "Data received and buffered");
+                sendMusicResponse(session, ackResponse);
             }
             
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) {

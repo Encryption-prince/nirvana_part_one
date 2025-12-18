@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain-to-Music Streaming API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Brain-to-Music Streaming API</h1>
+        <p class="status">✅ Service is running</p>
+        
+        <h2>WebSocket Endpoint</h2>
+        <div class="endpoint">wss://acute-grace-koyebdeployacc1-40f4b006.koyeb.app/ws/brain-waves</div>
+        
+        <h2>How to Connect</h2>
+        <p>Send EEG data as JSON messages:</p>
+        <pre>{
+  "timestamp": 1703123456789,
+  "signalData": [1.5, 2.3, -0.8, 4.2, ...]
+}</pre>
+        
+        <h2>Test Connection</h2>
+        <button class="test-button" onclick="testConnection()">Test WebSocket Connection</button>
+        <div id="status"></div>
+        
+        <h2>Features</h2>
+        <ul>
+            <li>Real-time EEG data processing</li>
+            <li>Session management with automatic cleanup</li>
+            <li>Buffer management (2000 sample limit)</li>
+            <li>Music generation trigger (1280+ samples)</li>
+            <li>30-second cooldown between generations</li>
+        </ul>
+    </div>
+
+    <script>
+        function testConnection() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = 'Connecting...';
+            statusDiv.className = '';
+            
+            const ws = new WebSocket('wss://acute-grace-koyebdeployacc1-40f4b006.koyeb.app/ws/brain-waves');
+            
+            ws.onopen = () => {
+                statusDiv.innerHTML = '✅ Connected successfully!';
+                statusDiv.className = 'connected';
+                
+                // Send test data
+                const testData = {
+                    timestamp: Date.now(),
+                    signalData: [1.5, 2.3, -0.8, 4.2, 1.1]
+                };
+                ws.send(JSON.stringify(testData));
+                
+                setTimeout(() => ws.close(), 2000);
+            };
+            
+            ws.onmessage = (event) => {
+                const response = JSON.parse(event.data);
+                statusDiv.innerHTML += '<br>📨 Response: ' + response.status;
+            };
+            
+            ws.onerror = () => {
+                statusDiv.innerHTML = '❌ Connection failed';
+                statusDiv.className = 'error';
+            };
+            
+            ws.onclose = () => {
+                if (statusDiv.className === 'connected') {
+                    statusDiv.innerHTML += '<br>🔌 Connection closed';
+                }
+            };
+        }
+    </script>
+</body>
+</html>

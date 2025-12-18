@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -35,11 +36,25 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Handles static resource not found exceptions (typically from health checks)
+     * Logs at DEBUG level to reduce noise in production logs
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public void handleNoResourceFound(NoResourceFoundException e) {
+        // Only log at DEBUG level since these are typically health check requests
+        logger.debug("Static resource not found (likely health check): {}", e.getResourcePath());
+        // Don't log full stack trace for these common occurrences
+    }
+    
+    /**
      * Handles general exceptions to maintain system stability
      */
     @ExceptionHandler(Exception.class)
     public void handleGeneralException(Exception e) {
-        logger.error("General exception caught by global handler: {}", e.getMessage(), e);
+        // Skip logging NoResourceFoundException here since it's handled above
+        if (!(e instanceof NoResourceFoundException)) {
+            logger.error("General exception caught by global handler: {}", e.getMessage(), e);
+        }
         // Ensure system continues operating despite individual errors
     }
 }

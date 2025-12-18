@@ -1,3 +1,9 @@
 spring:
   application:
     name: nirvana
+
+logging:
+  level:
+    com.backend.nirvana.config.GlobalExceptionHandler: WARN  # Reduce noise from exception handler
+    org.springframework.web.servlet.resource: WARN  # Reduce static resource errors
+    org.springframework.web.servlet.mvc.method.annotation: WARN  # Reduce mapping errors
